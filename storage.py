@@ -3,10 +3,18 @@ class Storage:
         self.__pending = []
         self.__done = []
     
+
+    def getPending(self):
+        return self.__pending
+    
     def displayPending(self):
         print("Pending:")
-        for each in self.__pending:
-            print(each)
+        
+        if len(self.__pending) > 0:
+            for i, each in enumerate(self.__pending):
+                print(f"({i + 1}) {each}")
+        else:
+            print("Congrats!!! No pending")
 
     def displayDone(self):
         print("Done:") 
@@ -16,14 +24,13 @@ class Storage:
     def storePending(self, pendingTask : object) -> None:
         self.__pending.append(pendingTask)
     
-    def markDone(self, doneTask : object) -> None:
+    def markDone(self, doneTask : object):
+        doneTask.changeStatus()
         self.__done.append(doneTask)
-
+        
         for each in self.__pending:
-            if each in self.__done:
+            if each.getStatus() == True:
                 self.__pending.remove(each)
-    
-    def __str__(self):
-        return f"{self.__pending}\n{self.__done}"
+
 
 

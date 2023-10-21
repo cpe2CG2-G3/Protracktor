@@ -1,12 +1,17 @@
-from task import Task
-from storage import Storage
-
+from interface import Interface, storage
 if __name__ == "__main__":
-    taskOne = Task()
-    storage = Storage()
+    menu = Interface()
+    nothingToDo = len(storage.getPending()) == 0
+    isAsking = True
+    while isAsking:
+        ask = input("load / work").lower()
 
-    storage.storePending(taskOne)
-    storage.displayPending()
-    storage.markDone(taskOne)
-    #storage.displayDone()
-    storage.displayPending()
+        if ask == "load":
+            while menu.atInputQueueProcess():
+                menu.atInputQueue()
+        elif ask == "work":
+            if nothingToDo:
+                print("You have nothing to do...")
+            else:
+                while menu.atCountdownProcess():
+                    menu.countingDown()
