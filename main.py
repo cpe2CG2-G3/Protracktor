@@ -1,17 +1,24 @@
-from interface import Interface, storage
-if __name__ == "__main__":
-    menu = Interface()
-    nothingToDo = len(storage.getPending()) == 0
-    isAsking = True
-    while isAsking:
-        ask = input("load / work").lower()
+from interface import Interface
+from storage import Storage
+from task import Task
+from timer import Timer 
 
-        if ask == "load":
-            while menu.atInputQueueProcess():
-                menu.atInputQueue()
-        elif ask == "work":
-            if nothingToDo:
-                print("You have nothing to do...")
-            else:
-                while menu.atCountdownProcess():
-                    menu.countingDown()
+if __name__ == "__main__":
+    states = ("adding_workload", "working", "checking_progress")
+    task = Task()
+    timer = Timer()
+    storage = Storage()
+    menu = Interface(storage,timer)
+
+    #dagdag ka ng termination sa states para mag terminate ang program
+    #start ka na mag implement ng file handling
+    while True:
+        if menu.machineState() == states[0]:
+            menu.atAddingWorkLoad()
+        elif menu.machineState() == states[1]:
+            menu.atWorkingProcess()
+        elif menu.machineState() == states[2]:
+            menu.atCheckingProgress()
+            menu.resetStateTransition()
+        
+        
