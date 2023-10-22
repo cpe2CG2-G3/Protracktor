@@ -1,0 +1,12 @@
+Task: Study Discrete Math
+Time to take: 00:45:00
+Done: True
+
+Task: Study FEC for the Quiz
+Time to take: 02:00:00
+Done: False
+
+Task: Study FEC for the Quiz
+Time to take: 02:00:00
+Done: True
+

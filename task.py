@@ -30,5 +30,5 @@ class Task:
     
     #misc
     def __str__(self) -> str:
-        return f"Task: {self.__taskName}\nETA: {self.__timeTaken}\nDone?: {self.__isDone}"
+        return f"Task: {self.__taskName}\nETA: {self.__timeTaken}\n"
     

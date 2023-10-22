@@ -1,5 +1,5 @@
 from task import Task
-#please add a condition to make way for program termination
+
 class Interface:
     def __init__(self, pseudoDB : object, timer : object):
         self.__isTerminated = False
@@ -10,12 +10,13 @@ class Interface:
         self.__timer = timer
         self.__pseudoDB = pseudoDB
         self.__currentState = ""
-    
+        self.__receipt = open("progress.txt", "a")
+
     #state checker
     def machineState(self) -> str:
         stateSignals = { (True, False, False, False, False) : "terminated",
                          (False, True, False, False, False) : "at_home_menu",
-                         (False, False, True, False, False) : "adding_work",
+                         (False, False, True, False, False) : "adding_workload",
                          (False, False, False, True, False) : "working",
                          (False, False, False, False, True) : "checking_progress"
                        }
@@ -44,6 +45,7 @@ class Interface:
                 self.__isAtHomeMenu = False
                 self.__isTerminated = True
             elif ask == "y":
+                self.__isAtHomeMenu = False
                 self.__isAtAddingWorkLoad = True
 
         return self.__isAtHomeMenu 
@@ -68,7 +70,7 @@ class Interface:
         somethingToDo = len(self.__pseudoDB.getPending()) > 0
 
         if somethingToDo:
-            print(f"{self.__pseudoDB.displayPending()}")
+            self.__pseudoDB.displayPending()
             taskSelection = input("Select task from the index: ")
             currentTask = self.__pseudoDB.getPending()[int(taskSelection)]
             self.__pseudoDB.setWIP(currentTask)
@@ -83,15 +85,26 @@ class Interface:
 
         if somethingToDo:
             currentTask = self.__pseudoDB.getWIP()
-            ask = input(f"\nIs {currentTask[0]} done: ")
+            ask = input(f"\nIs {currentTask[0].getTaskName()} done: ")
         
             if ask == "y":
                 currentTask[0].changeStatus()
+                self.__receipt.write(f"Task: {currentTask[0].getTaskName()}\n")
+                self.__receipt.write(f"Time to take: {currentTask[0].getTimeTaken()}\n")
+                self.__receipt.write(f"Done: {str(currentTask[0].getStatus())}\n\n")
                 self.__pseudoDB.markDone(currentTask[0])
-                print(self.__pseudoDB.displayDone())
-                self.__pseudoDB.clearWIP()
-                self.__isCheckingWorkProgress = False
 
+            elif ask == "n":
+                self.__receipt.write(f"Task: {currentTask[0].getTaskName()}\n")
+                self.__receipt.write(f"Time to take: {currentTask[0].getTimeTaken()}\n")
+                self.__receipt.write(f"Done: {str(currentTask[0].getStatus())}\n\n")
+
+            self.__pseudoDB.clearWIP()
+        
+        self.__isCheckingWorkProgress = False
         self.__isAtAddingWorkLoad = True
         
         return self.__isCheckingWorkProgress 
+    
+    def closeFile(self) -> None:
+        self.__receipt.close() 
