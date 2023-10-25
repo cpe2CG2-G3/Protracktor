@@ -7,4 +7,5 @@ class Timer:
     #leave as it is na lang 'to matagal to gawin kasi may math involved
     def countDown(self, currentTask):
         timeLimit = currentTask.getTimeTaken().split(":")
+        print(f"Doing {currentTask.getTaskName()}\n")
         print("Assume that the timer algorithm is running\nTime\'s up\n")

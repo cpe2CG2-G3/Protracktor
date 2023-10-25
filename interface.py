@@ -1,72 +1,50 @@
 from task import Task
+from states import MachineState 
 
 class Interface:
     def __init__(self, pseudoDB : object, timer : object):
-        self.__isTerminated = False
-        self.__isAtHomeMenu = True
-        self.__isAtAddingWorkLoad = False
-        self.__isWorking = False
-        self.__isCheckingWorkProgress = False
         self.__timer = timer
         self.__pseudoDB = pseudoDB
-        self.__currentState = ""
+        self.__currentState = MachineState.HOME_MENU
         self.__receipt = open("progress.txt", "a")
 
     #state checker
-    def machineState(self) -> str:
-        stateSignals = { (True, False, False, False, False) : "terminated",
-                         (False, True, False, False, False) : "at_home_menu",
-                         (False, False, True, False, False) : "adding_workload",
-                         (False, False, False, True, False) : "working",
-                         (False, False, False, False, True) : "checking_progress"
-                       }
-        
-        for signals, state in stateSignals.items():
-            if signals == (self.__isTerminated, self.__isAtHomeMenu, self.__isAtAddingWorkLoad, self.__isWorking, self.__isCheckingWorkProgress):
-                self.__currentState = state
-                break
+    def machineState(self) -> int:
         return self.__currentState
     
-    #state modifiers
-    def resetStateTransition(self) -> bool:
-        self.__isTerminated = False
-        self.__isAtHomeMenu = True
-        self.__isAtAddingWorkLoad = False
-        self.__isWorking = False
-        self.__isCheckingWorkProgress = False
-
-        return self.__isAtHomeMenu
-
-    def atHomeMenu(self):
-        while self.__isAtHomeMenu == True:
+    #state handlers
+    
+    def resetState(self) -> int:
+        self.__currentState = MachineState.HOME_MENU
+        return self.__currentState
+    
+    def atHomeMenu(self) -> int:
+        while self.__currentState == MachineState.HOME_MENU:
             ask = input("wanna be productive [y/n]: ").lower()
             
             if ask == "n":
-                self.__isAtHomeMenu = False
-                self.__isTerminated = True
+                self.__currentState = MachineState.TERMINATED
             elif ask == "y":
-                self.__isAtHomeMenu = False
-                self.__isAtAddingWorkLoad = True
+                self.__currentState = MachineState.ADDING_WORKLOAD
 
-        return self.__isAtHomeMenu 
+        return self.__currentState
         
-    def atAddingWorkLoad(self) -> bool:
-        while self.__isAtAddingWorkLoad == True:
+    def atAddingWorkLoad(self) -> int:
+        while self.__currentState == MachineState.ADDING_WORKLOAD:
             ask = input("add work [y/n]: ").lower()
 
             if ask == "n":
-                self.__isAtAddingWorkLoad = False
-                self.__isWorking = True
+                self.__currentState = MachineState.WORK_SELECTION
             elif ask == "y":
                 task = Task()
                 task.setTaskName()
                 task.setTimeTaken()
                 self.__pseudoDB.storePending(task)
 
-        return self.__isAtAddingWorkLoad 
+        return self.__currentState
         
-  
-    def atWorkingProcess(self) -> bool:
+    
+    def atWorkSelectionProcess(self) -> int:
         somethingToDo = len(self.__pseudoDB.getPending()) > 0
 
         if somethingToDo:
@@ -74,37 +52,66 @@ class Interface:
             taskSelection = input("Select task from the index: ")
             currentTask = self.__pseudoDB.getPending()[int(taskSelection)]
             self.__pseudoDB.setWIP(currentTask)
-            self.__timer.countDown(currentTask)
+            self.__currentState = MachineState.WORKING
+        else:
+            print("NO WORK TO SELECT [NO PENDING TASK]\n")
+            self.__currentState = MachineState.ADDING_WORKLOAD
 
-        self.__isWorking = False 
-        self.__isCheckingWorkProgress = True
-        return self.__isWorking
+        return self.__currentState
+    
+    def atWorkingProcess(self) -> int:
+        somethingToDo = len(self.__pseudoDB.getPending()) > 0
+
+        if somethingToDo:
+            currentTask = self.__pseudoDB.getWIP()
+            self.__timer.countDown(currentTask[0])
+            self.__currentState = MachineState.CHECKING_PROGRESS
+        else:
+            print("Timer will not start ticking... [NO PENDING TASKS]\n")
+            self.__currentState = MachineState.ADDING_WORKLOAD
+
+        return self.__currentState
     
     def atCheckingProgress(self) -> bool:
         somethingToDo = len(self.__pseudoDB.getPending()) > 0
 
         if somethingToDo:
             currentTask = self.__pseudoDB.getWIP()
-            ask = input(f"\nIs {currentTask[0].getTaskName()} done: ")
+            ask = input(f"\nIs {currentTask[0].getTaskName()} done [y/n]: ").lower()
         
             if ask == "y":
                 currentTask[0].changeStatus()
                 self.__receipt.write(f"Task: {currentTask[0].getTaskName()}\n")
                 self.__receipt.write(f"Time to take: {currentTask[0].getTimeTaken()}\n")
                 self.__receipt.write(f"Done: {str(currentTask[0].getStatus())}\n\n")
+                
                 self.__pseudoDB.markDone(currentTask[0])
+
+                self.__currentState = MachineState.HOME_MENU
+                self.__pseudoDB.clearWIP()
 
             elif ask == "n":
                 self.__receipt.write(f"Task: {currentTask[0].getTaskName()}\n")
                 self.__receipt.write(f"Time to take: {currentTask[0].getTimeTaken()}\n")
                 self.__receipt.write(f"Done: {str(currentTask[0].getStatus())}\n\n")
 
-            self.__pseudoDB.clearWIP()
-        
-        self.__isCheckingWorkProgress = False
-        self.__isAtAddingWorkLoad = True
-        
-        return self.__isCheckingWorkProgress 
+                
+                self.__currentState = MachineState.RETRYING_TASK
+
+        return self.__currentState
+    
+    def atRetryingState(self) -> int:
+        currentTask = self.__pseudoDB.getWIP()
+        print(f"You didn\'t finished {currentTask[0].getTaskName()}\nFor how long you would like to try again?\n")
+
+        currentTask[0].setTimeTaken()
+
+        self.__currentState = MachineState.WORKING
+
+        return self.__currentState
+    
+    def cleanUp(self) -> None:
+        self.__pseudoDB.clearPending()
     
     def closeFile(self) -> None:
         self.__receipt.close() 

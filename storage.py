@@ -1,10 +1,9 @@
 class Storage:
     def __init__(self):
         self.__pending = []
-        self.__done = []
         self.__wip = []
     
-    def getPending(self):
+    def getPending(self) -> list:
         return self.__pending
     
     #may problem sa printing dito bakit may nag aappear na none
@@ -17,28 +16,37 @@ class Storage:
         else:
             print("Congrats!!! No pending")
 
-    def displayDone(self):
+    def displayDone(self) -> None:
         print("Done:") 
         for each in self.__done:
             print(each)
     
-    def storePending(self, pendingTask : object) -> None:
+    def storePending(self, pendingTask : object) -> list:
         self.__pending.append(pendingTask)
+
+        return self.__pending
+
+
+    def clearPending(self) -> list:
+        self.__pending.clear()
+
+        return self.__pending
     
-    def markDone(self, doneTask : object):
+    def markDone(self, doneTask : object) -> list:
         doneTask.changeStatus()
-        self.__done.append(doneTask)
         
         for each in self.__pending:
             if each.getStatus() == True:
                 self.__pending.remove(each)
+        
+        return self.__pending
 
     def setWIP(self, wip : object) -> list:
         return self.__wip.append(wip)
 
-    def getWIP(self):
+    def getWIP(self) -> list:
         return self.__wip
     
-    def clearWIP(self):
+    def clearWIP(self) -> list:
         self.__wip.pop(0)
         return self.__wip

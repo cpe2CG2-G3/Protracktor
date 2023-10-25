@@ -1,12 +1,44 @@
-Task: Study Discrete Math
-Time to take: 00:45:00
-Done: True
-
-Task: Study FEC for the Quiz
-Time to take: 02:00:00
+Task: Study TCW
+Time to take: 00:30:00
 Done: False
 
-Task: Study FEC for the Quiz
-Time to take: 02:00:00
+Task: sleep
+Time to take: 2
+Done: False
+
+Task: b
+Time to take: 12
+Done: False
+
+Task: b
+Time to take: 00:30:00
+Done: True
+
+Task: a
+Time to take: 12
+Done: True
+
+Task: eat
+Time to take: 12
+Done: False
+
+Task: eat
+Time to take: 00:10:00
+Done: True
+
+Task: eat
+Time to take: 00:5:00
+Done: True
+
+Task: Study DM
+Time to take: 01:45:00
+Done: False
+
+Task: Study DM
+Time to take: 00:30:00
+Done: True
+
+Task: Study OOP
+Time to take: 00:45:00
 Done: True
 

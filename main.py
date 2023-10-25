@@ -2,6 +2,7 @@ from interface import Interface
 from storage import Storage
 from task import Task
 from timer import Timer 
+from states import MachineState
 from os import system, name
 import time
 
@@ -17,29 +18,32 @@ if __name__ == "__main__":
     storage = Storage()
     menu = Interface(storage,timer)
 
-    states = ("terminated", "at_home_menu" ,"adding_workload", "working", "checking_progress")
-    
     isProgramRunning = True
 
     while isProgramRunning:
-        if menu.machineState() == states[0]:
-            menu.closeFile()
-            isProgramRunning = False
-        elif menu.machineState() == states[1]:
-            clearScreen()
+        menuStatus = menu.machineState()
+        if menuStatus == MachineState.HOME_MENU:
             menu.atHomeMenu()
-        elif menu.machineState() == states[2]:
             clearScreen()
+        elif menuStatus == MachineState.ADDING_WORKLOAD:
             menu.atAddingWorkLoad()
-        elif menu.machineState() == states[3]:
             clearScreen()
+        elif menuStatus == MachineState.WORK_SELECTION:
+            menu.atWorkSelectionProcess()
+        elif menuStatus == MachineState.WORKING:
             menu.atWorkingProcess()
             time.sleep(5)
-        elif menu.machineState() == states[4]:
             clearScreen()
+        elif menuStatus == MachineState.CHECKING_PROGRESS:
             menu.atCheckingProgress()
-            menu.resetStateTransition()
-        else:
             clearScreen()
-            menu.resetStateTransition()
-       
+        elif menuStatus == MachineState.RETRYING_TASK:
+            menu.atRetryingState()
+        elif menuStatus == MachineState.TERMINATED:
+            menu.cleanUp()
+            menu.closeFile()
+            isProgramRunning = False
+        else:
+            menu.resetState()
+            clearScreen()
+        
