@@ -42,3 +42,7 @@ Task: Study OOP
 Time to take: 00:45:00
 Done: True
 
+Task: Install Tiny10 OS
+Time to take: 01:45:00
+Done: True
+
