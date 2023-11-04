@@ -8,3 +8,4 @@ class MachineState(Enum):
     WORKING = 4
     CHECKING_PROGRESS = 5
     RETRYING_TASK = 6
+    ERROR = -1
