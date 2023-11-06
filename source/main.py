@@ -25,7 +25,7 @@ if __name__ == "__main__":
                 MachineState.WORKING : lambda: protracktor.atWorkingProcess(storage),
                 MachineState.CHECKING_PROGRESS : lambda: protracktor.atCheckingProgress(storage),
                 MachineState.RETRYING_TASK : lambda: protracktor.atRetryingState(storage),
-                MachineState.TERMINATED : lambda: protracktor.atTermination(),
+                MachineState.TERMINATED : lambda: protracktor.atTermination(storage),
                 MachineState.ERROR : lambda: protracktor.resetState()
                 }
 
@@ -54,8 +54,8 @@ if __name__ == "__main__":
                 protocol[MachineState.RETRYING_TASK]()
                 clearScreen()
             case MachineState.TERMINATED:
-                protocol[MachineState.TERMINATED]
+                protocol[MachineState.TERMINATED]()
                 isProgramRunning = False
             case MachineState.ERROR:
-                protocol[MachineState.ERROR]
+                protocol[MachineState.ERROR]()
         

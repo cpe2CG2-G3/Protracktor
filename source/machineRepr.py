@@ -93,10 +93,11 @@ class Protracktor:
 
                 case "n":    
                     self.__currentState = MachineState.RETRYING_TASK
+                    self.__fileLogger.log(currentTask)
 
         return self.__currentState
     
-    #still untouched please fix
+   
     def atRetryingState(self, pseudoDB : object) -> MachineState:
         currentTask = pseudoDB.getWIP()
         print(f"You didn\'t finished {currentTask.getTaskName()}\nFor how long you would like to try again?\n")
@@ -109,7 +110,6 @@ class Protracktor:
     
     def atTermination(self, pseudoDB : object) -> MachineState:
         if pseudoDB.isNotEmpty():
-            for each in pseudoDB.getPendingList():
-                self.__fileLogger.log(each)
-        
+           for each in pseudoDB.getPendingList():
+               self.__fileLogger.log(each)
         return self.__currentState

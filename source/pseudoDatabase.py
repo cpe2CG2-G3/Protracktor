@@ -36,7 +36,6 @@ class PseudoDB(PseudoDBInterface):
         for i, each in enumerate(pendingTask):
             self.__pending.append(each)
             taskGenerator.popTask(index)
-            print(f"{i}{type(each)} is being popped")
             index += 1
 
         return self.__pending
