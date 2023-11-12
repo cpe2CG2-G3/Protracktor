@@ -1,8 +1,8 @@
 from taskGenerator import TaskGenerator
 from pseudoDatabase import PseudoDB
-from timer import Timer 
 from expState import MachineState
 from machineRepr import Protracktor
+from taskHandling import TaskHandler
 from os import system, name
 import time
 
@@ -14,18 +14,18 @@ def clearScreen():
 
 if __name__ == "__main__":
     taskGenerator= TaskGenerator()
-    timer = Timer()
-    storage = PseudoDB()
-    protracktor = Protracktor()
+    taskHandler = TaskHandler()
+    pseudoDB = PseudoDB()
+    protracktor = Protracktor(taskHandler, pseudoDB, taskGenerator)
                 
     protocol = {
                 MachineState.HOME_MENU : lambda: protracktor.atHomeMenu(),
-                MachineState.ADDING_WORKLOAD : lambda: protracktor.atAddingWorkLoad(taskGenerator, storage),
-                MachineState.WORK_SELECTION : lambda: protracktor.atWorkSelectionProcess(storage),
-                MachineState.WORKING : lambda: protracktor.atWorkingProcess(storage),
-                MachineState.CHECKING_PROGRESS : lambda: protracktor.atCheckingProgress(storage),
-                MachineState.RETRYING_TASK : lambda: protracktor.atRetryingState(storage),
-                MachineState.TERMINATED : lambda: protracktor.atTermination(storage),
+                MachineState.ADDING_WORKLOAD : lambda: protracktor.atAddingWorkLoad(),
+                MachineState.WORK_SELECTION : lambda: protracktor.atWorkSelectionProcess(),
+                MachineState.WORKING : lambda: protracktor.atWorkingProcess(),
+                MachineState.CHECKING_PROGRESS : lambda: protracktor.atCheckingProgress(),
+                MachineState.RETRYING_TASK : lambda: protracktor.atRetryingState(),
+                MachineState.TERMINATED : lambda: protracktor.atTermination(),
                 MachineState.ERROR : lambda: protracktor.resetState()
                 }
 

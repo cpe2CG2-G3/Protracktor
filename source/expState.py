@@ -1,11 +1,11 @@
-from enum import Enum
+from enum import Enum, auto
 
 class MachineState(Enum):
-    TERMINATED = 0
-    HOME_MENU = 1
-    ADDING_WORKLOAD = 2
-    WORK_SELECTION = 3
-    WORKING = 4
-    CHECKING_PROGRESS = 5
-    RETRYING_TASK = 6
-    ERROR = -1
+    TERMINATED = auto()
+    HOME_MENU = auto()
+    ADDING_WORKLOAD = auto()
+    WORK_SELECTION = auto()
+    WORKING = auto()
+    CHECKING_PROGRESS = auto()
+    RETRYING_TASK = auto()
+    ERROR = auto()
