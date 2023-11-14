@@ -6,3 +6,4 @@ class TaskHandler(Enum):
     DO_TASK = auto()
     LOG_WHEN_DONE = auto()
     LOG_WHEN_NOT_DONE = auto()
+    RETRYING = auto()

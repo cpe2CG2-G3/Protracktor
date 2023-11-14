@@ -8,3 +8,4 @@ class PseudoDBInterface(ABC):
     @abstractmethod
     def sendData(self) -> list:
         pass
+    

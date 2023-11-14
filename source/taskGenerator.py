@@ -7,7 +7,9 @@ class TaskGenerator:
     def listDownTasks(self) -> list:
         toDo = Task()
         toDo.setTaskName()
-        toDo.setEstimatedTimeTaken()
+        toDo.setHour()
+        toDo.setMinute()
+        toDo.setSecond()
 
         self.__tasks.append(toDo)
     

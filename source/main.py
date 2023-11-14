@@ -3,19 +3,18 @@ from pseudoDatabase import PseudoDB
 from expState import MachineState
 from machineRepr import Protracktor
 from taskHandling import TaskHandler
-from os import system, name
+from filelogger import FileLogger
+from timeHandler import Timer
+from screenRefresher import clearScreen
+
 import time
 
-def clearScreen():
-    if name == "posix":
-        system("clear")
-    elif name == "nt":
-        system("cls")
-
 if __name__ == "__main__":
+    fileLogger = FileLogger()
     taskGenerator= TaskGenerator()
-    taskHandler = TaskHandler()
     pseudoDB = PseudoDB()
+    timer = Timer(pseudoDB)
+    taskHandler = TaskHandler(fileLogger, timer, pseudoDB)
     protracktor = Protracktor(taskHandler, pseudoDB, taskGenerator)
                 
     protocol = {
@@ -28,7 +27,7 @@ if __name__ == "__main__":
                 MachineState.TERMINATED : lambda: protracktor.atTermination(),
                 MachineState.ERROR : lambda: protracktor.resetState()
                 }
-
+    
     isProgramRunning = True
     while isProgramRunning:
         protracktorStatus = protracktor.machineState()

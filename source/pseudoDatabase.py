@@ -4,6 +4,7 @@ class PseudoDB(PseudoDBInterface):
     def __init__(self):
         self.__wip = []
         self.__pending = []
+        self.__completed = []
     
     def sendData(self) -> list:
         return self.__pending
@@ -11,7 +12,6 @@ class PseudoDB(PseudoDBInterface):
     def isNotEmpty(self) -> bool:
         return len(self.__pending) > 0
 
-    
     def displayPending(self):
         print("Pending:")
         
@@ -29,6 +29,9 @@ class PseudoDB(PseudoDBInterface):
     def getPendingList(self) -> list:
         return self.__pending
 
+    def getCompletedList(self) -> list:
+        return self.__completed
+    
     def retrieveData(self, taskGenerator : object) -> list:
         pendingTask = taskGenerator.getTasks()
         index = 0
@@ -57,7 +60,8 @@ class PseudoDB(PseudoDBInterface):
 
         for each in self.__pending:
             if each == self.getWIP():
+                self.__completed.append(each)
                 self.__pending.remove(each)
         
         self.__clearWIP()
-        return self.__pending
+        return self.__completed
