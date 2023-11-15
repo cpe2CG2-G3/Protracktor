@@ -17,7 +17,7 @@ class TaskHandler:
     def selectWork(self, pseudoDB : object):
         pseudoDB.displayPending()
         taskSelection = int(input("Select task from the index: "))
-        currentTask = pseudoDB.getPendingList()[taskSelection]
+        currentTask = pseudoDB.readPendingList()[taskSelection]
         pseudoDB.setWIP(currentTask)
             
     

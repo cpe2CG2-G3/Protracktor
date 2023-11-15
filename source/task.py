@@ -106,4 +106,4 @@ class Task:
     
     def __str__(self):
         timeFormat = f"{str(self.__hourToTake).zfill(2)}:{str(self.__minuteToTake).zfill(2)}:{str(self.__secondToTake).zfill(2)}"
-        return f"Task: {self.__taskName}\nDate: {self.__getDate()}\nTime Taken: {timeFormat}\nDone: {self.__isDone}\n"
+        return f"Name: {self.__taskName}\nDate: {self.__getDate()}\nTime Taken: {timeFormat}\nDone: {self.__isDone}\n"

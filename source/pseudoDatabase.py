@@ -1,10 +1,15 @@
 from pseudoDBInterface import PseudoDBInterface
-
+from rich.table import Table
+from rich.console import Console
 class PseudoDB(PseudoDBInterface):
     def __init__(self):
         self.__wip = []
         self.__pending = []
         self.__completed = []
+        self.__table = Table()
+        self.__table.add_column("Index", justify="center")
+        self.__table.add_column("Task", justify="left")
+        self.__console = Console()
     
     def sendData(self) -> list:
         return self.__pending
@@ -12,12 +17,16 @@ class PseudoDB(PseudoDBInterface):
     def isNotEmpty(self) -> bool:
         return len(self.__pending) > 0
 
-    def displayPending(self):
-        print("Pending:")
-        
+    #needs for fixing tomorrow
+    def displayPending(self):        
         if self.isNotEmpty():
+            self.__console.print("[bold red]Pending:\n".center(45))
             for i, each in enumerate(self.__pending):
-                print(f"({i}) {each}")
+                task_exists = any(row  == str(each) for row in self.__table.rows)
+                if not task_exists:
+                    self.__table.add_row(str(i), str(each))
+            
+            self.__console.print(self.__table)
         else:
             print("Congrats!!! No pending")
 
@@ -26,7 +35,7 @@ class PseudoDB(PseudoDBInterface):
         for each in self.__done:
             print(each)
     
-    def getPendingList(self) -> list:
+    def readPendingList(self) -> list:
         return self.__pending
 
     def getCompletedList(self) -> list:

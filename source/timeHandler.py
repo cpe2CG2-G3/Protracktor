@@ -1,7 +1,7 @@
 from screenRefresher import clearScreen
 from timeHandlerState import TimerState
 from extensionTime import ExtensionTime
-from pyfiglet import figlet_format, print_figlet
+from pyfiglet import print_figlet
 from rich import print as rprint
 import time
 class Timer:
@@ -42,8 +42,7 @@ class Timer:
                 currentTask.extendHour(self.__extension.hour)
                 currentTask.extendMinute(self.__extension.minute)
                 currentTask.extendSecond(self.__extension.second)
-                
-                
+                          
         return self.__currentState
 
     def __countDownExtension(self):
@@ -60,7 +59,7 @@ class Timer:
             minute = int((elapsed / self.__conversion["minuteToSecond"]) % self.__conversion["minuteToSecond"])
             second = int(elapsed % self.__conversion["minuteToSecond"])
 
-            print(f"\t\t\t\t\t\t\tWork In Progress: {currentTask.getTaskName()}")
-            print(f"\t\t\t\t\t\t\t{hour:02}:{minute:02}:{second:02}")
+            rprint(f"\t\t\t\t\t\t\t[green]Work In Progress: {currentTask.getTaskName()}")
+            print_figlet(f"\t\t\t\t\t\t\t{hour:02}:{minute:02}:{second:02}")
             time.sleep(0.0000000000000000005)
             clearScreen()

@@ -9,3 +9,10 @@ class PseudoDBInterface(ABC):
     def sendData(self) -> list:
         pass
     
+    @abstractmethod
+    def displayPending(self) -> list:
+        pass
+
+    @abstractmethod
+    def readPendingList(self) -> list:
+        pass
