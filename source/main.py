@@ -64,4 +64,4 @@ if __name__ == "__main__":
                     protocol[MachineState.ERROR]()
         except KeyboardInterrupt:
             protocol[MachineState.ERROR]()
-            
+            clearScreen()

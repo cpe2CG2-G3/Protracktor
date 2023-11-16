@@ -1,10 +1,13 @@
 from  timeHandlerState import TimerState
+from rich.console import Console
+from screenRefresher import clearScreen
 
 class TaskHandler:
     def __init__(self, fileLogger, timer, pseudoDB):
         self.__timer = timer 
         self.__fileLogger = fileLogger
         self.__pseudoDB = pseudoDB
+        self.__console = Console()
 
         self.__checkTime = {TimerState.NORMAL_COUNTDOWN : lambda: self.__timer.countDown(),
                             TimerState.EXTENSION_COUNTDOWN : lambda: self.__timer.countDown()}
@@ -15,11 +18,24 @@ class TaskHandler:
         
     
     def selectWork(self, pseudoDB : object):
-        pseudoDB.displayPending()
-        taskSelection = int(input("Select task from the index: "))
-        currentTask = pseudoDB.readPendingList()[taskSelection]
-        pseudoDB.setWIP(currentTask)
-            
+        selecting = True
+        while selecting:
+            try:
+                self.__console.print(pseudoDB.displayPending())
+                taskSelection = int(input("Select task from the index: "))
+                currentTask = pseudoDB.readPendingList()[taskSelection]
+                pseudoDB.setWIP(currentTask)
+            except ValueError as ve:
+                self.__console.print("[bold red]Error: ", ve)
+                clearScreen()
+            except IndexError as ie:
+                self.__console.print("[bold red]Error: ", ie)
+                clearScreen()
+            else:
+                selecting = False
+
+                
+                    
     
     def doCurrentTask(self):
         self.__checkTime[TimerState.NORMAL_COUNTDOWN]()

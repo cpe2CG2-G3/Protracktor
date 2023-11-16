@@ -1,0 +1,55 @@
+Name: abstraction
+Date: 2023-11-16
+Time Taken: 00:00:05
+Done: True
+
+Name: debug
+Date: 2023-11-16
+Time Taken: 00:00:02
+Done: True
+
+Name: eat
+Date: 2023-11-16
+Time Taken: 00:00:08
+Done: True
+
+Name: sleep
+Date: 2023-11-16
+Time Taken: 00:00:07
+Done: True
+
+Name: refactor
+Date: 2023-11-16
+Time Taken: 00:00:08
+Done: True
+
+Name: think
+Date: 2023-11-16
+Time Taken: 00:00:03
+Done: True
+
+Name: tulong
+Date: 2023-11-16
+Time Taken: 00:00:05
+Done: True
+
+Name: review
+Date: 2023-11-16
+Time Taken: 00:00:04
+Done: True
+
+Name: eat
+Date: 2023-11-16
+Time Taken: 00:00:10
+Done: True
+
+Name: eay
+Date: 2023-11-16
+Time Taken: 00:00:30
+Done: True
+
+Name: sleep
+Date: 2023-11-16
+Time Taken: 00:00:02
+Done: True
+
