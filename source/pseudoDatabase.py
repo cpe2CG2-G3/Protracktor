@@ -24,6 +24,7 @@ class PseudoDB(PseudoDBInterface):
            display = "[blink][red]No Pending..."
 
         return display
+    
     def displayDone(self) -> None:
         display = ""        
         if self.isCompletedNotEmpty():
@@ -60,7 +61,7 @@ class PseudoDB(PseudoDBInterface):
     def getWIP(self) -> list:
         return self.__wip[0]
     
-    def __clearWIP(self) -> list:
+    def clearWIP(self) -> list:
         self.__wip.clear()
         return self.__wip
 
@@ -72,5 +73,9 @@ class PseudoDB(PseudoDBInterface):
                 self.__completed.append(each)
                 self.__pending.remove(each)
         
-        self.__clearWIP()
+        self.clearWIP()
         return self.__completed
+    
+    def clearPending(self) -> list:
+        self.__pending.clear()
+        return self.__pending
