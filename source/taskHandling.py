@@ -1,12 +1,12 @@
 from  timeHandlerState import TimerState
 from rich.console import Console
 from screenRefresher import clearScreen
-
+from pyfiglet import figlet_format
+from expState import MachineState
 class TaskHandler:
-    def __init__(self, fileLogger, timer, pseudoDB):
+    def __init__(self, fileLogger, timer):
         self.__timer = timer 
         self.__fileLogger = fileLogger
-        self.__pseudoDB = pseudoDB
         self.__console = Console()
 
         self.__checkTime = {TimerState.NORMAL_COUNTDOWN : lambda: self.__timer.countDown(),
@@ -37,7 +37,8 @@ class TaskHandler:
 
     def doCurrentTask(self):
         self.__checkTime[TimerState.NORMAL_COUNTDOWN]()
-        print("Time's up!\n")
+        timesOverBanner = figlet_format("Time's Up")
+        self.__console.print(f"[bright_red]{timesOverBanner}")
 
     def logWhenDone(self, pseudoDB : object):
         currentTask = pseudoDB.getWIP()   
@@ -45,16 +46,16 @@ class TaskHandler:
         self.__fileLogger.log(currentTask)
         pseudoDB.markDone()
 
-    def logWhenNotDone(self, task : object):
-        self.__fileLogger.log(task)
+    def logWhenNotDone(self, pseudoDB : object):
+        currentTask = pseudoDB.getWIP()   
+        self.__fileLogger.log(currentTask.getTaskName())
        
-    def retryTask(self):
-        currentTask = self.__pseudoDB.getWIP()
-        print(f"You didn\'t finished {currentTask.getTaskName()}\nFor how long you would like to try again?\n")
-
+    def retryTask(self) -> MachineState:
         self.__timer.changeState(TimerState.EXTENSION_COUNTDOWN)
-        self.__checkTime[TimerState.EXTENSION_COUNTDOWN]
-    
+        self.__checkTime[TimerState.EXTENSION_COUNTDOWN]()
+        timesOverBanner = figlet_format("Time's Up")
+        self.__console.print(f"[bright_red]{timesOverBanner}")
+        
     def redoWorkAdding(self, pseudoDB : object) -> object:
         pseudoDB.clearPending()
         return pseudoDB

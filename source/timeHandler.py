@@ -19,7 +19,7 @@ class Timer:
         self.__currentState = nextState
 
     def countDown(self) -> TimerState:
-        workingBanner = figlet_format("WORKING PROCESS")
+        workingBanner = figlet_format("WORKING")
         self.__layout.split_column(Layout(name = "header"), Layout(name = "watch"))
     
         self.__layout["header"].update(Panel(f"[bold green3]{workingBanner}"))
@@ -72,7 +72,7 @@ class Timer:
             second = int(elapsed % self.__conversion["minuteToSecond"])
 
             timer = figlet_format(f"{hour:02}:{minute:02}:{second:02}")
-            self.__layout["body"]["mid"].update(f"""\t\t\t\t\t\t\t[blink][bright_green]Work In Progress[/blink][/bright_green]: {currentTask.getTaskName()}\n\n
-                                                {timer}""")
+            self.__layout["watch"].update(Panel(f"[blink][bright_green]Work In Progress[/blink][/bright_green]: {currentTask.getTaskName()}\n\n[magenta]{timer}".center(45, " ")))
+            self.__console.print(self.__layout)
             time.sleep(1)
             clearScreen()

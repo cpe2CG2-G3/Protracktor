@@ -22,8 +22,8 @@ class Protracktor(State):
                      TaskHandler.SELECT_WORK : lambda: self.__taskHandler.selectWork(self.__pseudoDB),
                      TaskHandler.DO_TASK : lambda: self.__taskHandler.doCurrentTask(),
                      TaskHandler.RETRYING : lambda: self.__taskHandler.retryTask(),
-                     TaskHandler.LOG_WHEN_DONE : lambda: self.__taskHandler.logWhenDone(self.__pseudoDB),
-                     TaskHandler.LOG_WHEN_NOT_DONE : lambda x: self.__taskHandler.logWhenNotDone(x),
+                     TaskHandler.LOG_WHEN_DONE : lambda pseudoDB: self.__taskHandler.logWhenDone(pseudoDB),
+                     TaskHandler.LOG_WHEN_NOT_DONE : lambda pseudoDB: self.__taskHandler.logWhenNotDone(pseudoDB),
                      TaskHandler.REDO_WORKLOAD_ADDING : lambda pseudoDB : self.__taskHandler.redoWorkAdding(pseudoDB),
                      TaskHandler.REDO_WORK_SELECTION : lambda pseudoDB : self.__taskHandler.redoWorkSelection(pseudoDB)}
     
@@ -85,10 +85,11 @@ class Protracktor(State):
     def resetState(self) -> MachineState:
         self.__currentState = MachineState.HOME_MENU
         return self.__currentState
+    
     #iaabstract estetik nito
     def atHomeMenu(self) -> MachineState:
 
-        homeBanner = figlet_format("ProTrackTor", font = "slant")
+        homeBanner = figlet_format("ProTrackTor")
        
         description = "A [blink][green]text-based user interface (TUI)[/blink][/green] based application helps the client monitor their productivity."
         self.__layout.split_row(Layout(name = "left"), Layout(name = "mid"), Layout(name = "right"))
@@ -167,22 +168,29 @@ class Protracktor(State):
 
             match ask:
                 case UserResponse.YES:
-                    self.__do[TaskHandler.LOG_WHEN_DONE]()
+                    self.__do[TaskHandler.LOG_WHEN_DONE](self.__pseudoDB)
                     self.__currentState = MachineState.HOME_MENU
 
                 case UserResponse.NO:    
-                    self.__currentState = MachineState.RETRYING_TASK
+                    self.changeState(MachineState.RETRYING_TASK)
 
         return self.__currentState
     
-   
     def atRetryingState(self) -> MachineState:
-        self.__do[TaskHandler.RETRYING]()
-        self.__currentState = MachineState.WORKING
+        currentTask = self.__pseudoDB.getWIP()
+        warningBanner = figlet_format("Oh No!\n")
+        self.__console.print(f"[bright_red][blink]{warningBanner}[/bright_red][/blink]You didn\'t finished {currentTask.getTaskName()}\n")
+        response = input("Would you to like to extend your time? [y] [n]: ").lower()
+        
+        match response:
+            case UserResponse.YES:
+                self.__do[TaskHandler.RETRYING]()
+                self.changeState(MachineState.CHECKING_PROGRESS)
+            case UserResponse.NO:
+                self.__do[TaskHandler.LOG_WHEN_NOT_DONE](self.__pseudoDB)
+                self.changeState(MachineState.HOME_MENU)
+  
         return self.__currentState
     
     def atTermination(self) -> MachineState:
-        if self.__pseudoDB.isNotEmpty():
-           for each in self.__pseudoDB.getPendingList():
-               self.__do[TaskHandler.LOG_WHEN_NOT_DONE](each)
         return self.__currentState

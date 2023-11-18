@@ -39,12 +39,12 @@ class Task:
         settingHour = True
         while settingHour:
             try:
-                self.__hourToTake = int(input("HH: "))
-                assert 0 <= self.__hourToTake
+                self.__hourToTake = int(input("Type and Enter the hour/s to take [0 - 8 hour/s only]: "))
+                assert 0 <= self.__hourToTake <= 8
             except ValueError as ve:
                 print(f"Error: {ve}")
             except AssertionError:
-                print("The input must be a positive number") 
+                print("Invalid Time") 
             else:
                 settingHour = False    
         return self.__hourToTake
@@ -53,7 +53,7 @@ class Task:
         settingMinute = True
         while settingMinute:
             try:
-                self.__minuteToTake = int(input("mm: "))
+                self.__minuteToTake = int(input("Type and Enter the minute/s to take [0 - 59 minute/s only]: "))
                 assert 0 <= self.__minuteToTake < 60
             except ValueError as ve:
                 print(f"Error: {ve}")
@@ -68,9 +68,11 @@ class Task:
         
         while settingSecond:
             try:
-                self.__secondToTake = int(input("ss: "))
+                self.__secondToTake = int(input("Type and Enter the second/s to take [0 - 59 seconds only]: "))
                 if not(0 <= self.__secondToTake < 60):
-                    raise ValueError("Must be 0 - 60")
+                    raise ValueError("Must be 0 - 60 seconds")
+                elif self.__minuteToTake == 0 and self.__hourToTake == 0 and self.__secondToTake == 0:
+                    raise ValueError("Invalid time input")
             except ValueError as ve:
                 print(f"Error: {ve}")
             else:

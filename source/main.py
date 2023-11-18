@@ -7,7 +7,6 @@ from filelogger import FileLogger
 from timeHandler import Timer
 from screenRefresher import clearScreen
 from rich.console import Console
-from termcolor import colored
 
 import time
 
@@ -16,7 +15,7 @@ if __name__ == "__main__":
     taskGenerator= TaskGenerator()
     pseudoDB = PseudoDB()
     timer = Timer(pseudoDB)
-    taskHandler = TaskHandler(fileLogger, timer, pseudoDB)
+    taskHandler = TaskHandler(fileLogger, timer)
     protracktor = Protracktor(taskHandler, pseudoDB, taskGenerator)
 
     console = Console()
@@ -41,11 +40,9 @@ if __name__ == "__main__":
                     clearScreen()
                 case MachineState.ADDING_WORKLOAD:
                     protocol[MachineState.ADDING_WORKLOAD]()
-                    time.sleep(1)
                     clearScreen()
                 case MachineState.WORK_SELECTION:
                     protocol[MachineState.WORK_SELECTION]()
-                    time.sleep(1)
                     clearScreen()
                 case MachineState.WORKING:
                     protocol[MachineState.WORKING]()
@@ -56,7 +53,6 @@ if __name__ == "__main__":
                     clearScreen()
                 case MachineState.RETRYING_TASK:
                     protocol[MachineState.RETRYING_TASK]()
-                    #clearScreen()
                 case MachineState.TERMINATED:
                     protocol[MachineState.TERMINATED]()
                     isProgramRunning = False
