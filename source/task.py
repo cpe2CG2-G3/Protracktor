@@ -58,7 +58,7 @@ class Task:
             except ValueError as ve:
                 print(f"Error: {ve}")
             except AssertionError:
-                print("The input must be within 0 - 59 minutes")
+                print("Invalid Time")
             else:
                 settingMinute = False
         return self.__minuteToTake
@@ -69,12 +69,13 @@ class Task:
         while settingSecond:
             try:
                 self.__secondToTake = int(input("Type and Enter the second/s to take [0 - 59 seconds only]: "))
-                if not(0 <= self.__secondToTake < 60):
-                    raise ValueError("Must be 0 - 60 seconds")
-                elif self.__minuteToTake == 0 and self.__hourToTake == 0 and self.__secondToTake == 0:
+                assert 0 <= self.__secondToTake < 60
+                if self.__minuteToTake == 0 and self.__hourToTake == 0 and self.__secondToTake == 0:
                     raise ValueError("Invalid time input")
             except ValueError as ve:
                 print(f"Error: {ve}")
+            except AssertionError:
+                print("Invalid Time")
             else:
                 settingSecond = False 
         

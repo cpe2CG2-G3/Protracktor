@@ -6,8 +6,6 @@ from taskHandling import TaskHandler
 from filelogger import FileLogger
 from timeHandler import Timer
 from screenRefresher import clearScreen
-from rich.console import Console
-
 import time
 
 if __name__ == "__main__":
@@ -18,7 +16,6 @@ if __name__ == "__main__":
     taskHandler = TaskHandler(fileLogger, timer)
     protracktor = Protracktor(taskHandler, pseudoDB, taskGenerator)
 
-    console = Console()
     protocol = {
                 MachineState.HOME_MENU : lambda: protracktor.atHomeMenu(),
                 MachineState.ADDING_WORKLOAD : lambda: protracktor.atAddingWorkLoad(),
@@ -47,7 +44,6 @@ if __name__ == "__main__":
                 case MachineState.WORKING:
                     protocol[MachineState.WORKING]()
                     time.sleep(1)
-                    clearScreen()
                 case MachineState.CHECKING_PROGRESS:
                     protocol[MachineState.CHECKING_PROGRESS]()
                     clearScreen()

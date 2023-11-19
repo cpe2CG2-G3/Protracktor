@@ -8,12 +8,12 @@ class ExtensionTime:
         settingHour = True
         while settingHour:
             try:
-                self.hour = int(input("HH: "))
-                assert 0 <= self.hour
+                self.hour = int(input("Type and Enter the hour/s to extend [0 - 8 hour/s only]: "))
+                assert 0 <= self.hour <= 8
             except ValueError as ve:
                 print(f"Error: {ve}")
             except AssertionError:
-                print("The input must be a positive number") 
+                print("Error: Invalid Time") 
             else:
                 settingHour = False    
         return self.hour
@@ -22,12 +22,12 @@ class ExtensionTime:
         settingMinute = True
         while settingMinute:
             try:
-                self.minute = int(input("mm: "))
+                self.minute = int(input("Type and Enter the minute/s to extend [0 - 59 minute/s only]: "))
                 assert 0 <= self.minute < 60
             except ValueError as ve:
                 print(f"Error: {ve}")
             except AssertionError:
-                print("The input must be within 0 - 59 minutes")
+                print("Invalid TIme")
             else:
                 settingMinute = False
         return self.minute
@@ -37,11 +37,14 @@ class ExtensionTime:
         
         while settingSecond:
             try:
-                self.second = int(input("ss: "))
-                if not(0 <= self.second < 60):
-                    raise ValueError("Must be 0 - 60")
+                self.second = int(input("Type and Enter the second/s to extend [0 - 59 seconds only]: "))
+                assert 0 <= self.second < 60
+                if self.hour == 0 and self.minute == 0 and self.second == 0:
+                    raise ValueError("Impossible to Track")
             except ValueError as ve:
                 print(f"Error: {ve}")
+            except AssertionError:
+                print("Invalid Time")
             else:
                 settingSecond = False 
         

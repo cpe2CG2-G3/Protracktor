@@ -2,15 +2,18 @@ from  timeHandlerState import TimerState
 from rich.console import Console
 from screenRefresher import clearScreen
 from pyfiglet import figlet_format
+from rich.panel import Panel
 from expState import MachineState
+import time 
+
 class TaskHandler:
     def __init__(self, fileLogger, timer):
         self.__timer = timer 
         self.__fileLogger = fileLogger
         self.__console = Console()
 
-        self.__checkTime = {TimerState.NORMAL_COUNTDOWN : lambda: self.__timer.countDown(),
-                            TimerState.EXTENSION_COUNTDOWN : lambda: self.__timer.countDown()}
+        self.__checkTime = {TimerState.NORMAL_COUNTDOWN : lambda: self.__timer.countDownNormally(),
+                            TimerState.EXTENSION_COUNTDOWN : lambda: self.__timer.countDownExtended()}
     
     def addWork(self, taskGenerator : object, pseudoDB : object) -> None:
         taskGenerator.listDownTasks()
@@ -38,26 +41,30 @@ class TaskHandler:
     def doCurrentTask(self):
         self.__checkTime[TimerState.NORMAL_COUNTDOWN]()
         timesOverBanner = figlet_format("Time's Up")
-        self.__console.print(f"[bright_red]{timesOverBanner}")
-
+        self.__console.print(Panel(f"[bright_red]{timesOverBanner}"))
+        time.sleep(0.5)
+        
     def logWhenDone(self, pseudoDB : object):
         currentTask = pseudoDB.getWIP()   
         currentTask.changeStatus()
         self.__fileLogger.log(currentTask)
         pseudoDB.markDone()
 
-    def logWhenNotDone(self, pseudoDB : object):
-        currentTask = pseudoDB.getWIP()   
-        self.__fileLogger.log(currentTask.getTaskName())
+    def logWhenNotDone(self, task : object):
+        self.__fileLogger.log(task)
        
     def retryTask(self) -> MachineState:
         self.__timer.changeState(TimerState.EXTENSION_COUNTDOWN)
         self.__checkTime[TimerState.EXTENSION_COUNTDOWN]()
         timesOverBanner = figlet_format("Time's Up")
-        self.__console.print(f"[bright_red]{timesOverBanner}")
+        self.__console.print(Panel(f"[bright_red]{timesOverBanner}"))
+        time.sleep(0.5)
         
     def redoWorkAdding(self, pseudoDB : object) -> object:
-        pseudoDB.clearPending()
+        if not pseudoDB.isNotEmpty():
+            pseudoDB.clearPending()
+        else:
+            pseudoDB.pop()
         return pseudoDB
     
     def redoWorkSelection(self, pseudoDB : object) -> object:

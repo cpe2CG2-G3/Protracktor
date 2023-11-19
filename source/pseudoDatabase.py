@@ -1,5 +1,5 @@
 from pseudoDBInterface import PseudoDBInterface
-from rich.console import Console
+
 class PseudoDB(PseudoDBInterface):
     def __init__(self):
         self.__wip = []
@@ -14,7 +14,7 @@ class PseudoDB(PseudoDBInterface):
 
     def isCompletedNotEmpty(self) -> bool:
         return len(self.__completed) > 0
-    #needs for fixing tomorrow
+
     def displayPending(self) -> str:
         display = ""        
         if self.isNotEmpty():
@@ -48,7 +48,7 @@ class PseudoDB(PseudoDBInterface):
 
         for i, each in enumerate(pendingTask):
             self.__pending.append(each)
-            taskGenerator.popTask(index)
+            taskGenerator.popTask(i)
             index += 1
 
         return self.__pending
@@ -78,4 +78,8 @@ class PseudoDB(PseudoDBInterface):
     
     def clearPending(self) -> list:
         self.__pending.clear()
+        return self.__pending
+    
+    def pop(self) -> list:
+        self.__pending.pop()
         return self.__pending

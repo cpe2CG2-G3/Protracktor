@@ -7,7 +7,7 @@ from rich.layout import Layout
 from rich.panel import Panel
 from rich.console import Console
 from pyfiglet import figlet_format
-
+import time
 
 class Protracktor(State):
     def __init__(self, taskHandler, pseudoDB, taskGenerator):
@@ -18,14 +18,14 @@ class Protracktor(State):
         self.__currentState = MachineState.HOME_MENU
         self.__taskHandler = taskHandler
         self.__choices = {UserResponse.YES : "Yes", UserResponse.NO : "No", UserResponse.BACK : "Back" }
-        self.__do = {TaskHandler.ADD_WORKLOAD : lambda: self.__taskHandler.addWork(self.__taskGenerator, self.__pseudoDB),
-                     TaskHandler.SELECT_WORK : lambda: self.__taskHandler.selectWork(self.__pseudoDB),
+        self.__do = {TaskHandler.ADD_WORKLOAD : lambda taskGenerator, pseudoDB: self.__taskHandler.addWork(taskGenerator, pseudoDB),
+                     TaskHandler.SELECT_WORK : lambda pseudoDB: self.__taskHandler.selectWork(pseudoDB),
                      TaskHandler.DO_TASK : lambda: self.__taskHandler.doCurrentTask(),
                      TaskHandler.RETRYING : lambda: self.__taskHandler.retryTask(),
                      TaskHandler.LOG_WHEN_DONE : lambda pseudoDB: self.__taskHandler.logWhenDone(pseudoDB),
                      TaskHandler.LOG_WHEN_NOT_DONE : lambda pseudoDB: self.__taskHandler.logWhenNotDone(pseudoDB),
-                     TaskHandler.REDO_WORKLOAD_ADDING : lambda pseudoDB : self.__taskHandler.redoWorkAdding(pseudoDB),
-                     TaskHandler.REDO_WORK_SELECTION : lambda pseudoDB : self.__taskHandler.redoWorkSelection(pseudoDB)}
+                     TaskHandler.REDO_WORKLOAD_ADDING : lambda pseudoDB: self.__taskHandler.redoWorkAdding(pseudoDB),
+                     TaskHandler.REDO_WORK_SELECTION : lambda pseudoDB: self.__taskHandler.redoWorkSelection(pseudoDB)}
     
 
     #private methods
@@ -43,7 +43,7 @@ class Protracktor(State):
         
     
 
-    def __binaryQuestion(self, currentState : MachineState, 
+    def __query(self, currentState : MachineState, 
                          prompt : str, yesResponse : MachineState, 
                          noResponse : MachineState, previousState : MachineState) -> None:
         while self.__currentState == currentState:
@@ -64,7 +64,7 @@ class Protracktor(State):
         option_str = "Instructions: Type and enter the specified string from the string options below to interact with the program...\n\n"
 
         for each in self.__choices:
-            option_str += f"{each}: {self.__choices[each]}\n"
+            option_str += f" [ {each} ]: {self.__choices[each]}\n"
         return option_str
     
     
@@ -73,6 +73,12 @@ class Protracktor(State):
                 \nWhile for the full list of completed task, go check the local text file named [bold green]progress.txt[/bold green]
                 """
          return caveat
+    
+    def __noPendingWarning(self) -> None:
+        warningBanner =  figlet_format("NO PENDING TASK")
+        self.__console.print(Panel(f"[bright_red]{warningBanner}"))
+
+
 
     #public methods        
     def changeState(self, nextState):
@@ -93,8 +99,8 @@ class Protracktor(State):
        
         description = "A [blink][green]text-based user interface (TUI)[/blink][/green] based application helps the client monitor their productivity."
         self.__layout.split_row(Layout(name = "left"), Layout(name = "mid"), Layout(name = "right"))
-        
         self.__layout["left"].split_column(Layout(name = "title"), Layout(name = "description"))
+        self.__layout["left"].ratio = 2
         self.__layout["left"]["title"].update(Panel(f"[cyan2]{homeBanner}"))
         self.__layout["left"]["description"].update(Panel(description))
         
@@ -105,7 +111,8 @@ class Protracktor(State):
         self.__layout["right"]["completed"].update(Panel(f"[blink][bold bright_green]Completed\n[/bold bright_green][/blink]{self.__pseudoDB.displayDone()}"))
   
         self.__console.print(self.__layout)
-        self.__binaryQuestion(MachineState.HOME_MENU, "Options: ", MachineState.ADDING_WORKLOAD, MachineState.TERMINATED, MachineState.HOME_MENU)
+        self.__query(MachineState.HOME_MENU, "Options: ", MachineState.ADDING_WORKLOAD, MachineState.TERMINATED, MachineState.HOME_MENU)
+        
         return self.__currentState
     
     #iaabstract estetik nito
@@ -124,10 +131,10 @@ class Protracktor(State):
         ask = input("Add workload [y] [n] [b]: ").lower()
         match ask:
             case UserResponse.YES:
-                self.__do[TaskHandler.ADD_WORKLOAD]()  
+                self.__do[TaskHandler.ADD_WORKLOAD](self.__taskGenerator, self.__pseudoDB)  
                 self.__doubleChecking(MachineState.ADDING_WORKLOAD)  
             case UserResponse.NO:
-                self.__binaryQuestion(MachineState.ADDING_WORKLOAD,"Continue Adding? [y] [n]: ", MachineState.ADDING_WORKLOAD, MachineState.WORK_SELECTION, MachineState.HOME_MENU)
+                self.__query(MachineState.ADDING_WORKLOAD,"Continue Adding? [y] [n] [b]: ", MachineState.ADDING_WORKLOAD, MachineState.WORK_SELECTION, MachineState.HOME_MENU)
             case UserResponse.BACK:
                 self.changeState(MachineState.HOME_MENU)
 
@@ -135,16 +142,20 @@ class Protracktor(State):
         
     def atWorkSelectionProcess(self) -> MachineState:
         somethingToDo = self.__pseudoDB.isNotEmpty()
+        
         workSelectionBanner = figlet_format("WORK SELECTION")
+
         workSelectionBanner.center(len(workSelectionBanner))
-        self.__console.print(f"[bright_magenta]{workSelectionBanner}")
+        self.__console.print(Panel(f"[bright_magenta]{workSelectionBanner}"))
+
         if somethingToDo:
-            self.__do[TaskHandler.SELECT_WORK]()
+            self.__do[TaskHandler.SELECT_WORK](self.__pseudoDB)
             self.__doubleChecking(MachineState.WORKING)
 
         else:
-            rprint("[red]NO WORK TO SELECT [NO PENDING TASK]\n")
-            self.__currentState = MachineState.ADDING_WORKLOAD
+            self.__noPendingWarning()
+            self.changeState(MachineState.ADDING_WORKLOAD)
+            time.sleep(2)
 
         return self.__currentState
     
@@ -154,13 +165,16 @@ class Protracktor(State):
             self.__do[TaskHandler.DO_TASK]()
             self.changeState(MachineState.CHECKING_PROGRESS)
         else:
-            rprint("[red]", figlet_format("NO PENDING TASK"))
+            self.__noPendingWarning()
             self.changeState(MachineState.ADDING_WORKLOAD)
+            time.sleep(2)
 
         return self.__currentState
     
     def atCheckingProgress(self) -> MachineState:
         somethingToDo = self.__pseudoDB.isNotEmpty()
+        checkingProgressBanner = figlet_format("Checking Progress")
+        self.__console.print(Panel(f"[cyan2]{checkingProgressBanner}"))
 
         if somethingToDo:
             currentTask = self.__pseudoDB.getWIP()
@@ -169,7 +183,7 @@ class Protracktor(State):
             match ask:
                 case UserResponse.YES:
                     self.__do[TaskHandler.LOG_WHEN_DONE](self.__pseudoDB)
-                    self.__currentState = MachineState.HOME_MENU
+                    self.changeState(MachineState.HOME_MENU)
 
                 case UserResponse.NO:    
                     self.changeState(MachineState.RETRYING_TASK)
@@ -179,7 +193,9 @@ class Protracktor(State):
     def atRetryingState(self) -> MachineState:
         currentTask = self.__pseudoDB.getWIP()
         warningBanner = figlet_format("Oh No!\n")
-        self.__console.print(f"[bright_red][blink]{warningBanner}[/bright_red][/blink]You didn\'t finished {currentTask.getTaskName()}\n")
+
+        self.__console.print(Panel(f"[bright_red][blink]{warningBanner}[/bright_red][/blink]"))
+        self.__console.print(f"You didn\'t finished [bright_red]{currentTask.getTaskName()}[/bright_red]\n")
         response = input("Would you to like to extend your time? [y] [n]: ").lower()
         
         match response:
@@ -187,10 +203,13 @@ class Protracktor(State):
                 self.__do[TaskHandler.RETRYING]()
                 self.changeState(MachineState.CHECKING_PROGRESS)
             case UserResponse.NO:
-                self.__do[TaskHandler.LOG_WHEN_NOT_DONE](self.__pseudoDB)
+                #self.__do[TaskHandler.LOG_WHEN_NOT_DONE](self.__pseudoDB)
                 self.changeState(MachineState.HOME_MENU)
   
         return self.__currentState
     
     def atTermination(self) -> MachineState:
+        if self.__pseudoDB.isNotEmpty():
+            for each in self.__pseudoDB.readPendingList():
+                self.__do[TaskHandler.LOG_WHEN_NOT_DONE](each)
         return self.__currentState
