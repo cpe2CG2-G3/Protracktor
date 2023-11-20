@@ -17,5 +17,5 @@ class TaskGenerator:
         self.__tasks.pop(index)
         return self.__tasks
 
-    def getTasks(self):
+    def getTasks(self) -> list:
         return self.__tasks

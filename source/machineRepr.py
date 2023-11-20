@@ -42,7 +42,6 @@ class Protracktor(State):
                         self.__do[TaskHandler.REDO_WORK_SELECTION](self.__pseudoDB)
         
     
-
     def __query(self, currentState : MachineState, 
                          prompt : str, yesResponse : MachineState, 
                          noResponse : MachineState, previousState : MachineState) -> None:
@@ -57,7 +56,7 @@ class Protracktor(State):
                 case UserResponse.BACK:
                     self.changeState(previousState)
                 case _:
-                    print("[red]Try again...\n")
+                    self.__console.print("[bright_red]Try again...\n")
             return ask
 
     def __displayInstruction(self) -> str:
@@ -69,7 +68,7 @@ class Protracktor(State):
     
     
     def __caveat(self) -> str:
-         caveat = """\n[bold]The right panel is still at alpha test[/b]...\nTo see the full details of all the pending list, it is located at the [bold green]Work Selection State of the Program[/bold green]
+         caveat = """[bold]The right panel is still at alpha test[/bold]...\nTo see the full details of all the pending list, it is located at the [bold green]Work Selection State of the Program[/bold green]
                 \nWhile for the full list of completed task, go check the local text file named [bold green]progress.txt[/bold green]
                 """
          return caveat
@@ -77,8 +76,6 @@ class Protracktor(State):
     def __noPendingWarning(self) -> None:
         warningBanner =  figlet_format("NO PENDING TASK")
         self.__console.print(Panel(f"[bright_red]{warningBanner}"))
-
-
 
     #public methods        
     def changeState(self, nextState):
@@ -106,26 +103,27 @@ class Protracktor(State):
         
         self.__layout["mid"].update(Panel(f"{self.__caveat()}\n{self.__displayInstruction()}\n[blink][bold cyan]Wish to proceed?[/bold cyan][/blink]"))
         self.__layout["right"].split_column(Layout(name="pending"), Layout(name="completed"))
-        self.__layout["right"]["pending"].update(Panel(f"[blink][bold bright_red]Pending\n[/bold bright_red][/blink]{self.__pseudoDB.displayPending()}"))
+        self.__layout["right"]["pending"].update(Panel(f"[blink][bold bright_red]Pending:\n\n[/bold bright_red][/blink]{self.__pseudoDB.displayPending()}"))
 
-        self.__layout["right"]["completed"].update(Panel(f"[blink][bold bright_green]Completed\n[/bold bright_green][/blink]{self.__pseudoDB.displayDone()}"))
+        self.__layout["right"]["completed"].update(Panel(f"[blink][bold bright_green]Completed:\n\n[/bold bright_green][/blink]{self.__pseudoDB.displayDone()}"))
   
         self.__console.print(self.__layout)
         self.__query(MachineState.HOME_MENU, "Options: ", MachineState.ADDING_WORKLOAD, MachineState.TERMINATED, MachineState.HOME_MENU)
         
         return self.__currentState
     
-    #iaabstract estetik nito
     def atAddingWorkLoad(self) -> MachineState:
         workLoadBanner = figlet_format("Adding Workload")
+        
         self.__layout.split_row(Layout(name = "left"), Layout(name = "mid"), Layout(name = "right"))
+        self.__layout["left"].ratio = 2
         self.__layout["left"].update(Panel(workLoadBanner))
         self.__layout["mid"].update(Panel(f"{self.__caveat()}\n\n{self.__displayInstruction()}\n[blink][bold cyan]Wish to proceed?[/bold cyan][/blink]"))
-        
-        self.__layout["right"].split_column(Layout(name="pending"), Layout(name="completed"))
-        self.__layout["right"]["pending"].update(Panel(f"[blink][bold bright_red]Pending\n[/bold bright_red][/blink]{self.__pseudoDB.displayPending()}"))
 
-        self.__layout["right"]["completed"].update(Panel(f"[blink][bold bright_green]Completed\n[/bold bright_green][/blink]{self.__pseudoDB.displayDone()}"))
+        self.__layout["right"].split_column(Layout(name="pending"), Layout(name="completed"))
+        self.__layout["right"]["pending"].update(Panel(f"[blink][bold bright_red]Pending:\n\n[/bold bright_red][/blink]{self.__pseudoDB.displayPending()}"))
+
+        self.__layout["right"]["completed"].update(Panel(f"[blink][bold bright_green]Completed:\n\n[/bold bright_green][/blink]{self.__pseudoDB.displayDone()}"))
         self.__console.print(self.__layout)
        
         ask = input("Add workload [y] [n] [b]: ").lower()
@@ -143,11 +141,6 @@ class Protracktor(State):
     def atWorkSelectionProcess(self) -> MachineState:
         somethingToDo = self.__pseudoDB.isNotEmpty()
         
-        workSelectionBanner = figlet_format("WORK SELECTION")
-
-        workSelectionBanner.center(len(workSelectionBanner))
-        self.__console.print(Panel(f"[bright_magenta]{workSelectionBanner}"))
-
         if somethingToDo:
             self.__do[TaskHandler.SELECT_WORK](self.__pseudoDB)
             self.__doubleChecking(MachineState.WORKING)
@@ -203,7 +196,6 @@ class Protracktor(State):
                 self.__do[TaskHandler.RETRYING]()
                 self.changeState(MachineState.CHECKING_PROGRESS)
             case UserResponse.NO:
-                #self.__do[TaskHandler.LOG_WHEN_NOT_DONE](self.__pseudoDB)
                 self.changeState(MachineState.HOME_MENU)
   
         return self.__currentState

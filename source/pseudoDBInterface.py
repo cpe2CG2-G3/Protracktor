@@ -16,3 +16,7 @@ class PseudoDBInterface(ABC):
     @abstractmethod
     def readPendingList(self) -> list:
         pass
+
+    @abstractmethod
+    def displayDone(self) -> list:
+        pass

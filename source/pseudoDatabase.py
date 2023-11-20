@@ -19,7 +19,7 @@ class PseudoDB(PseudoDBInterface):
         display = ""        
         if self.isNotEmpty():
             for i, each in enumerate(self.__pending):
-               display += f"({i})\n{each}"
+               display += f"Index: ({i})\n{each}\n"
         else:
            display = "[blink][red]No Pending..."
 
@@ -29,7 +29,7 @@ class PseudoDB(PseudoDBInterface):
         display = ""        
         if self.isCompletedNotEmpty():
             for i, each in enumerate(self.__completed):
-               display += f"({i})\n{each}"
+               display += f"Index: ({i})\n{each}\n"
             return display
         else:
            display = "[blink][blue]No Completed..."
@@ -44,12 +44,10 @@ class PseudoDB(PseudoDBInterface):
     
     def retrieveData(self, taskGenerator : object) -> list:
         pendingTask = taskGenerator.getTasks()
-        index = 0
-
+    
         for i, each in enumerate(pendingTask):
             self.__pending.append(each)
             taskGenerator.popTask(i)
-            index += 1
 
         return self.__pending
     

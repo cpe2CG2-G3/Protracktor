@@ -24,6 +24,10 @@ class TaskHandler:
         selecting = True
         while selecting:
             try:
+                workSelectionBanner = figlet_format("WORK SELECTION")
+
+                workSelectionBanner.center(len(workSelectionBanner))
+                self.__console.print(Panel(f"[bright_magenta]{workSelectionBanner}"))
                 self.__console.print(f"[bold bright_red][blink]Pending:[/bold bright_red][/blink]\n\n{pseudoDB.displayPending()}")
                 taskSelection = int(input("Select task from the index: "))
                 currentTask = pseudoDB.readPendingList()[taskSelection]
@@ -31,9 +35,11 @@ class TaskHandler:
                 self.__console.print(f"[bold][blink]Work to be accomplished[/blink]: [bright_yellow]{currentTask.getTaskName()}")
             except ValueError as ve:
                 self.__console.print("[bold red]Error: ", ve)
+                time.sleep(1)
                 clearScreen()
             except IndexError as ie:
                 self.__console.print("[bold red]Error: ", ie)
+                time.sleep(1)
                 clearScreen()
             else:
                 selecting = False
