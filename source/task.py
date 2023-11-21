@@ -31,7 +31,7 @@ class Task:
     
     #write only
     def setTaskName(self) -> str:
-        taskName = input("Task name: ")
+        taskName = input("(Type and enter) Task name: ")
         self.__taskName = taskName
         return self.__taskName
     

@@ -30,30 +30,26 @@ if __name__ == "__main__":
     isProgramRunning = True
     while isProgramRunning:
         protracktorStatus = protracktor.machineState()
-        try:
-            match protracktorStatus:
-                case MachineState.HOME_MENU:
-                    protocol[MachineState.HOME_MENU]()
-                    clearScreen()
-                case MachineState.ADDING_WORKLOAD:
-                    protocol[MachineState.ADDING_WORKLOAD]()
-                    clearScreen()
-                case MachineState.WORK_SELECTION:
-                    protocol[MachineState.WORK_SELECTION]()
-                    clearScreen()
-                case MachineState.WORKING:
-                    protocol[MachineState.WORKING]()
-                    time.sleep(1)
-                case MachineState.CHECKING_PROGRESS:
-                    protocol[MachineState.CHECKING_PROGRESS]()
-                    clearScreen()
-                case MachineState.RETRYING_TASK:
-                    protocol[MachineState.RETRYING_TASK]()
-                case MachineState.TERMINATED:
-                    protocol[MachineState.TERMINATED]()
-                    isProgramRunning = False
-                case MachineState.ERROR:
-                    protocol[MachineState.ERROR]()
-        except KeyboardInterrupt:
-            protocol[MachineState.ERROR]()
-            clearScreen()
+        match protracktorStatus:
+            case MachineState.HOME_MENU:
+                protocol[MachineState.HOME_MENU]()
+                clearScreen()
+            case MachineState.ADDING_WORKLOAD:
+                protocol[MachineState.ADDING_WORKLOAD]()
+                clearScreen()
+            case MachineState.WORK_SELECTION:
+                protocol[MachineState.WORK_SELECTION]()
+                clearScreen()
+            case MachineState.WORKING:
+                protocol[MachineState.WORKING]()
+                time.sleep(1)
+            case MachineState.CHECKING_PROGRESS:
+                protocol[MachineState.CHECKING_PROGRESS]()
+                clearScreen()
+            case MachineState.RETRYING_TASK:
+                protocol[MachineState.RETRYING_TASK]()
+            case MachineState.TERMINATED:
+                protocol[MachineState.TERMINATED]()
+                isProgramRunning = False
+            case MachineState.ERROR:
+                protocol[MachineState.ERROR]()
