@@ -125,7 +125,9 @@ class Protracktor(State):
         try:
             homeBanner = figlet_format("ProTrackTor")
         
-            description = "A [blink][green]text-based user interface (TUI)[/blink][/green] based application helps the client monitor their productivity."
+            description = """A [blink][green]text-based user interface (TUI)[/green][/blink] based application that helps the client monitor their productivity. Thus, it figuratively acts as the client's second brain as they keep working on their pending tasks. 
+                             \nThe concept is a melded version of a note-taking and timer program, powered by file-handling functionality that acts as a makeshift database."""
+            
             self.__layout.split_row(Layout(name = "left"), Layout(name = "mid"), Layout(name = "right"))
             self.__layout["left"].split_column(Layout(name = "title"), Layout(name = "description"))
             self.__layout["left"].ratio = 2
@@ -238,9 +240,9 @@ class Protracktor(State):
                     case UserResponse.YES:
                         self.__do[TaskHandler.LOG_WHEN_DONE](self.__pseudoDB)
                         self.changeState(MachineState.HOME_MENU)
-
                     case UserResponse.NO:    
                         self.changeState(MachineState.RETRYING_TASK)
+                        
             return self.__currentState
         except KeyboardInterrupt:
             self.changeState(MachineState.TERMINATED)
