@@ -49,7 +49,9 @@ class Protracktor(State):
                             self.__do[TaskHandler.REDO_WORKLOAD_ADDING](self.__pseudoDB)
                 case _:
                     self.__console.print("[bright_red]Error: invalid input[/bright_red]")
-                    self.__do[TaskHandler.REDO_WORKLOAD_ADDING](self.__pseudoDB)
+                    match self.__currentState:
+                        case MachineState.ADDING_WORKLOAD:
+                            self.__do[TaskHandler.REDO_WORKLOAD_ADDING](self.__pseudoDB)
                     time.sleep(1)
         except KeyboardInterrupt:
             self.changeState(MachineState.ERROR)
