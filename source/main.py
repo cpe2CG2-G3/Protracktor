@@ -6,6 +6,10 @@ from taskHandling import TaskHandler
 from filelogger import FileLogger
 from timeHandler import Timer
 from screenRefresher import clearScreen
+from rich.console import Console
+from rich.panel import Panel
+from pyfiglet import figlet_format
+
 import time
 
 if __name__ == "__main__":
@@ -27,29 +31,37 @@ if __name__ == "__main__":
                 MachineState.ERROR : lambda: protracktor.resetState()
                 }
     
-    isProgramRunning = True
-    while isProgramRunning:
-        protracktorStatus = protracktor.machineState()
-        match protracktorStatus:
-            case MachineState.HOME_MENU:
-                protocol[MachineState.HOME_MENU]()
-                clearScreen()
-            case MachineState.ADDING_WORKLOAD:
-                protocol[MachineState.ADDING_WORKLOAD]()
-                clearScreen()
-            case MachineState.WORK_SELECTION:
-                protocol[MachineState.WORK_SELECTION]()
-                clearScreen()
-            case MachineState.WORKING:
-                protocol[MachineState.WORKING]()
-                time.sleep(1)
-            case MachineState.CHECKING_PROGRESS:
-                protocol[MachineState.CHECKING_PROGRESS]()
-                clearScreen()
-            case MachineState.RETRYING_TASK:
-                protocol[MachineState.RETRYING_TASK]()
-            case MachineState.TERMINATED:
-                protocol[MachineState.TERMINATED]()
-                isProgramRunning = False
-            case MachineState.ERROR:
-                protocol[MachineState.ERROR]()
+    try:
+        isProgramRunning = True
+        while isProgramRunning:
+            protracktorStatus = protracktor.machineState()
+            match protracktorStatus:
+                case MachineState.HOME_MENU:
+                    protocol[MachineState.HOME_MENU]()
+                    clearScreen()
+                case MachineState.ADDING_WORKLOAD:
+                    protocol[MachineState.ADDING_WORKLOAD]()
+                    clearScreen()
+                case MachineState.WORK_SELECTION:
+                    protocol[MachineState.WORK_SELECTION]()
+                    clearScreen()
+                case MachineState.WORKING:
+                    protocol[MachineState.WORKING]()
+                    time.sleep(1)
+                case MachineState.CHECKING_PROGRESS:
+                    protocol[MachineState.CHECKING_PROGRESS]()
+                    clearScreen()
+                case MachineState.RETRYING_TASK:
+                    protocol[MachineState.RETRYING_TASK]()
+                case MachineState.TERMINATED:
+                    protocol[MachineState.TERMINATED]()
+                    isProgramRunning = False
+                case MachineState.ERROR:
+                    protocol[MachineState.ERROR]()
+    except EOFError:
+        clearScreen()
+        console = Console()
+        messageBanner = figlet_format("YOU ARE CAUGHT SLACKING!")
+        protocol[MachineState.TERMINATED]()
+        console.print(Panel(f"[bright_red]{messageBanner}"))
+        time.sleep(3)

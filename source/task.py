@@ -1,7 +1,8 @@
 from datetime import date
-
+from rich.console import Console
 class Task:
     def __init__(self):
+        self.__console = Console()
         self.__date = date.today()
         self.__taskName = ""
         self.__hourToTake = 0
@@ -42,9 +43,9 @@ class Task:
                 self.__hourToTake = int(input("Type and Enter the hour/s to take [0 - 8 hour/s only]: "))
                 assert 0 <= self.__hourToTake <= 8
             except ValueError as ve:
-                print(f"Error: {ve}")
+                self.__console.print(f"[bright_red]Error: {ve}")
             except AssertionError:
-                print("Invalid Time") 
+                self.__console.print("[bright_red]Invalid Time") 
             else:
                 settingHour = False    
         return self.__hourToTake
@@ -56,9 +57,9 @@ class Task:
                 self.__minuteToTake = int(input("Type and Enter the minute/s to take [0 - 59 minute/s only]: "))
                 assert 0 <= self.__minuteToTake < 60
             except ValueError as ve:
-                print(f"Error: {ve}")
+                self.__console.print(f"[bright_red]Error: {ve}")
             except AssertionError:
-                print("Invalid Time")
+                self.__console.print("[bright_red]Invalid Time")
             else:
                 settingMinute = False
         return self.__minuteToTake
@@ -73,9 +74,9 @@ class Task:
                 if self.__minuteToTake == 0 and self.__hourToTake == 0 and self.__secondToTake == 0:
                     raise ValueError("Invalid time input")
             except ValueError as ve:
-                print(f"Error: {ve}")
+                self.__console.print(f"[bright_red]Error: {ve}")
             except AssertionError:
-                print("Invalid Time")
+                self.__console.print("[bright_red]Invalid Time")
             else:
                 settingSecond = False 
         

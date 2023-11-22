@@ -39,7 +39,7 @@ class Protracktor(State):
     #private methods
     def __doubleChecking(self, yesResponse : MachineState) -> None:
         try:
-            askAgain = input("Are you sure? [y/n]: ")
+            askAgain = input("Are you sure? [y] [n]: ")
             match askAgain:
                 case UserResponse.YES:
                     self.changeState(yesResponse)
@@ -47,8 +47,10 @@ class Protracktor(State):
                     match self.__currentState:
                         case MachineState.ADDING_WORKLOAD:
                             self.__do[TaskHandler.REDO_WORKLOAD_ADDING](self.__pseudoDB)
-                        case MachineState.WORK_SELECTION:
-                            self.__do[TaskHandler.REDO_WORK_SELECTION](self.__pseudoDB)
+                case _:
+                    self.__console.print("[bright_red]Error: invalid input[/bright_red]")
+                    self.__do[TaskHandler.REDO_WORKLOAD_ADDING](self.__pseudoDB)
+                    time.sleep(1)
         except KeyboardInterrupt:
             self.changeState(MachineState.ERROR)
             
@@ -87,6 +89,9 @@ class Protracktor(State):
                         self.__console.print(self.__layout)
                     case _:
                         self.__console.print("[bright_red]Try again...\n")
+                        time.sleep(1)
+                        clearScreen()
+                        self.__console.print(self.__layout)
         except KeyboardInterrupt:
             self.changeState(MachineState.ERROR)
                 
@@ -100,14 +105,22 @@ class Protracktor(State):
     
     
     def __caveat(self) -> str:
-         caveat = """[bold]The right panel is still at alpha test[/bold]...To see the full details of the pending or the completed task. 
-                     Please type and enter the specific command to invoke that functionality. See the [bright_yellow]Instruction[/bright_yellow] label below...\n
+         caveat = """[bold]The right panel is still at alpha test[/bold]...To see the full details of the pending or the completed task.
+         \nPlease type and enter the specific command to invoke that functionality.
+         \nSee the [bright_yellow]Instruction[/bright_yellow] label below...\n
                 """
          return caveat
     
     def __noPendingWarning(self) -> None:
         warningBanner =  figlet_format("NO PENDING TASK")
         self.__console.print(Panel(f"[bright_red]{warningBanner}"))
+    
+    def __isUserSlacking(self) -> MachineState:
+        conscienceBanner = figlet_format("EMERGENCY???")
+        clearScreen()
+        self.__console.print(Panel(f"[blink][bright_red]{conscienceBanner}[/blink][/bright_red]"))
+        self.__console.print(f"[bold] Make sure you are not being unproductive...")
+        self.changeState(MachineState.TERMINATED)
 
     #public methods        
     def changeState(self, nextState):
@@ -188,6 +201,9 @@ class Protracktor(State):
                     self.changeState(MachineState.ADDING_WORKLOAD)
                     clearScreen()
                     self.__console.print(self.__layout)
+                case _:
+                    self.__console.print("[bright_red]Try again...\n")
+                    time.sleep(2)
         
 
             return self.__currentState
@@ -224,7 +240,7 @@ class Protracktor(State):
 
             return self.__currentState
         except KeyboardInterrupt:
-            self.changeState(MachineState.TERMINATED)
+            self.__isUserSlacking()
         
     def atCheckingProgress(self) -> MachineState:
         try:
@@ -242,6 +258,9 @@ class Protracktor(State):
                         self.changeState(MachineState.HOME_MENU)
                     case UserResponse.NO:    
                         self.changeState(MachineState.RETRYING_TASK)
+                    case _:
+                        self.__console.print("[bright_red]Error: Invalid Input")
+                        time.sleep(1)
                         
             return self.__currentState
         except KeyboardInterrupt:
@@ -262,10 +281,14 @@ class Protracktor(State):
                     self.changeState(MachineState.CHECKING_PROGRESS)
                 case UserResponse.NO:
                     self.changeState(MachineState.HOME_MENU)
+                case _:
+                    self.__console.print("[bright_red]Error: Invalid Input")
+                    time.sleep(1)
+                    clearScreen()
     
             return self.__currentState
         except KeyboardInterrupt:
-            self.changeState(MachineState.TERMINATED)
+             self.__isUserSlacking()
     
     def atTermination(self) -> MachineState:
         if self.__pseudoDB.isNotEmpty():

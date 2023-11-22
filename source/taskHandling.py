@@ -74,5 +74,5 @@ class TaskHandler:
         return pseudoDB
     
     def redoWorkSelection(self, pseudoDB : object) -> object:
-        pseudoDB.clearWIP()
+        pseudoDB.pop()
         return pseudoDB
